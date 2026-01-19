@@ -1,19 +1,45 @@
-import { HStack, Switch, Text, useColorMode } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 
 const ColorModeSwitch = () => {
-  const { toggleColorMode, colorMode } = useColorMode();
+  const [mode, setMode] = useState<"light" | "dark">("dark");
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem("theme");
+    if (stored === "light" || stored === "dark") {
+      setMode(stored);
+      return;
+    }
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    setMode(prefersDark ? "dark" : "light");
+  }, []);
+
+  useEffect(() => {
+    if (mode === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    window.localStorage.setItem("theme", mode);
+  }, [mode]);
+
+  const isDark = mode === "dark";
 
   return (
-    <HStack>
-      <Switch
-        colorScheme="green"
-        isChecked={colorMode === "dark"}
-        onChange={toggleColorMode}
-      />
-      <Text whiteSpace="nowrap">
-        {colorMode === "dark" ? "Light Mode" : "Dark Mode"}
-      </Text>
-    </HStack>
+    <div className="flex items-center gap-2">
+      <button
+        type="button"
+        onClick={() => setMode(isDark ? "light" : "dark")}
+        className="relative inline-flex h-6 w-11 items-center rounded-full border border-slate-400 bg-slate-200 transition dark:border-slate-600 dark:bg-slate-700"
+      >
+        <span
+          className={
+            "inline-block h-4 w-4 transform rounded-full bg-white shadow transition " +
+            (isDark ? "translate-x-5" : "translate-x-1")
+          }
+        />
+      </button>
+      <span className="whitespace-nowrap text-sm">{isDark ? "Light Mode" : "Dark Mode"}</span>
+    </div>
   );
 };
 
