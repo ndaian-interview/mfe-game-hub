@@ -1,17 +1,15 @@
 import { useEffect, useState } from "react";
 
 const ColorModeSwitch = () => {
-  const [mode, setMode] = useState<"light" | "dark">("dark");
-
-  useEffect(() => {
+  // Initialize from localStorage or system preference immediately
+  const [mode, setMode] = useState<"light" | "dark">(() => {
     const stored = window.localStorage.getItem("theme");
     if (stored === "light" || stored === "dark") {
-      setMode(stored);
-      return;
+      return stored;
     }
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    setMode(prefersDark ? "dark" : "light");
-  }, []);
+    return prefersDark ? "dark" : "light";
+  });
 
   useEffect(() => {
     if (mode === "dark") {

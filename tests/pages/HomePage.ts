@@ -39,10 +39,10 @@ export class NavBarComponent {
     this.page = page;
     this.searchInput = page.getByPlaceholder(/search/i);
     this.logo = page.locator('img[src*="logo"]');
-    this.colorModeSwitch = page
-      .locator("button")
-      .filter({ hasText: /dark|light/i })
-      .or(page.locator("label").filter({ has: page.locator('input[type="checkbox"]') }));
+    // Color mode switch is now a button with adjacent span text
+    this.colorModeSwitch = page.locator("button").filter({
+      has: page.locator("span.rounded-full.bg-white"),
+    });
   }
 
   async isVisible() {
@@ -65,13 +65,12 @@ export class GenreListComponent {
 
   constructor(page: Page) {
     this.page = page;
-    this.container = page
-      .locator("aside")
-      .or(page.getByRole("list").filter({ has: page.getByText(/action|adventure|rpg/i) }));
+    // Genre list is in the aside sidebar
+    this.container = page.locator("aside").first();
   }
 
   async selectGenre(genreName: string) {
-    await this.container.getByRole("button", { name: new RegExp(genreName, "i") }).click();
+    await this.container.locator("button", { hasText: new RegExp(genreName, "i") }).click();
   }
 
   async getSelectedGenre() {
@@ -95,18 +94,21 @@ export class PlatformSelectorComponent {
 
   constructor(page: Page) {
     this.page = page;
-    this.button = page
-      .getByRole("button", { name: "Platforms" })
-      .or(page.getByRole("button").filter({ hasText: /^(PC|PlayStation|Xbox|Nintendo)/ }));
-    this.menu = page.getByRole("menu").or(page.locator('[role="listbox"]'));
+    // Platform selector is now a native select element
+    this.button = page.locator("select").first();
+    this.menu = page.locator("select").first();
   }
 
   async selectPlatform(platformName: string) {
-    await this.button.click();
-    await this.menu
-      .getByRole("menuitem", { name: new RegExp(platformName, "i") })
-      .or(this.page.getByText(new RegExp(platformName, "i")))
-      .click();
+    // Select dropdown by finding option that matches the platform name
+    const options = await this.button.locator("option").all();
+    for (const option of options) {
+      const text = await option.textContent();
+      if (text && new RegExp(platformName, "i").test(text)) {
+        await this.button.selectOption({ label: text });
+        return;
+      }
+    }
   }
 
   async isVisible() {
@@ -121,16 +123,21 @@ export class SortSelectorComponent {
 
   constructor(page: Page) {
     this.page = page;
-    this.button = page.getByRole("button", { name: /sort|order|relevance/i });
-    this.menu = page.getByRole("menu").or(page.locator('[role="listbox"]'));
+    // Sort selector is now a native select element
+    this.button = page.locator("select").nth(1);
+    this.menu = page.locator("select").nth(1);
   }
 
   async selectSortOrder(sortOption: string) {
-    await this.button.click();
-    await this.menu
-      .getByRole("menuitem", { name: new RegExp(sortOption, "i") })
-      .or(this.page.getByText(new RegExp(sortOption, "i")))
-      .click();
+    // Select dropdown by finding option that matches the sort option
+    const options = await this.button.locator("option").all();
+    for (const option of options) {
+      const text = await option.textContent();
+      if (text && new RegExp(sortOption, "i").test(text)) {
+        await this.button.selectOption({ label: text });
+        return;
+      }
+    }
   }
 
   async isVisible() {
@@ -146,12 +153,10 @@ export class GameGridComponent {
 
   constructor(page: Page) {
     this.page = page;
-    this.container = page
-      .locator('[class*="css-"]')
-      .filter({ has: page.locator('[class*="card"]') })
-      .first();
-    this.gameCards = page.locator('[class*="card"]').or(page.getByRole("article"));
-    this.skeletons = page.locator('[class*="skeleton"]').or(page.locator('[data-loading="true"]'));
+    // Game grid is the main grid container with game cards
+    this.container = page.locator("div.grid.gap-6");
+    this.gameCards = page.getByRole("article");
+    this.skeletons = page.locator("div.animate-pulse");
   }
 
   async isVisible() {

@@ -10,35 +10,41 @@ test.describe("Theme Toggle", () => {
   });
 
   test("should toggle between light and dark mode", async ({ page }) => {
-    // Get initial theme
-    const initialBg = await page.locator("body").evaluate((el) => getComputedStyle(el).backgroundColor);
+    // Check initial dark class on html
+    const initialHasDark = await page.locator("html").evaluate((el) => el.classList.contains("dark"));
 
     // Toggle theme
     await homePage.navbar.toggleColorMode();
     await page.waitForTimeout(500); // Wait for theme transition
 
-    // Get new theme
-    const newBg = await page.locator("body").evaluate((el) => getComputedStyle(el).backgroundColor);
+    // Check new dark class state
+    const newHasDark = await page.locator("html").evaluate((el) => el.classList.contains("dark"));
 
-    // Background should have changed
-    expect(initialBg).not.toBe(newBg);
+    // Dark class should have toggled
+    expect(initialHasDark).not.toBe(newHasDark);
   });
 
   test("should persist theme after page reload", async ({ page }) => {
+    // Wait for initial load
+    await homePage.navbar.logo.waitFor({ state: "visible" });
+    await page.waitForTimeout(1000);
+
     // Toggle to a specific mode
     await homePage.navbar.toggleColorMode();
     await page.waitForTimeout(500);
 
-    const themeAfterToggle = await page.locator("body").evaluate((el) => getComputedStyle(el).backgroundColor);
+    const darkClassAfterToggle = await page.locator("html").evaluate((el) => el.classList.contains("dark"));
 
     // Reload page
     await page.reload();
-    await page.waitForTimeout(500);
+    // Wait for the React app to initialize
+    await homePage.navbar.logo.waitFor({ state: "visible" });
+    await page.waitForTimeout(1500);
 
-    const themeAfterReload = await page.locator("body").evaluate((el) => getComputedStyle(el).backgroundColor);
+    const darkClassAfterReload = await page.locator("html").evaluate((el) => el.classList.contains("dark"));
 
     // Theme should be the same
-    expect(themeAfterToggle).toBe(themeAfterReload);
+    expect(darkClassAfterToggle).toBe(darkClassAfterReload);
   });
 
   test("should display color mode switch button", async () => {
