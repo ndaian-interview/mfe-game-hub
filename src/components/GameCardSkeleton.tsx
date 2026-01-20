@@ -1,3 +1,5 @@
+import React from "react";
+
 const GameCardSkeleton = () => {
   //   console.log(`GameCardSkeleton`);
   return (

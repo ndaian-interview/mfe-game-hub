@@ -1,3 +1,4 @@
+import React from "react";
 import bullsEye from "../assets/Emojis/bulls-eye.webp";
 import thumbsUp from "../assets/Emojis/thumbs-up.webp";
 import meh from "../assets/Emojis/meh.webp";

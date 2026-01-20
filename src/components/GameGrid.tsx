@@ -1,3 +1,4 @@
+import React from "react";
 import { GameQuery } from "../App";
 import useGames from "../hooks/useGames";
 import GameCard from "./GameCard";

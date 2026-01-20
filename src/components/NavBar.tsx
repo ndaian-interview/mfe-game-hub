@@ -1,5 +1,5 @@
+import React from "react";
 import logo from "../assets/Logo/logo.webp";
-import ColorModeSwitch from "./ColorModeSwitch";
 import SearchInput from "./SearchInput";
 
 interface Props {
@@ -12,9 +12,6 @@ const NavBar = ({ onSearch }: Props) => {
       <img src={logo} alt="Game Hub Logo" className="h-12 w-12 flex-shrink-0 rounded-md" />
       <div className="flex-1">
         <SearchInput onSearch={onSearch} />
-      </div>
-      <div className="ml-auto flex-shrink-0">
-        <ColorModeSwitch />
       </div>
     </nav>
   );

@@ -1,3 +1,4 @@
+import React from "react";
 import { Game, Platform } from "../hooks/useGames";
 import PlatformIconList from "./PlatformIconList";
 import CriticScore from "./CriticScore";
